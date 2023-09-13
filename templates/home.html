@@ -1,55 +1,67 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Adventure Game</title>
-</head>
-<body>
+  </head>
+  <body>
+    <h1>Adventure Game</h1>
 
-<h1>Adventure Game</h1>
+    <p>Gold: {{ barbarian.gold }}</p>
+    <p id="xp_display">Experience: {{ barbarian.experience }}</p>
+    <p>Level: {{ barbarian.level }}</p>
+    <p>Items: {{ ', '.join(barbarian['items']) }}</p>
 
-<p>Gold: {{ barbarian.gold }}</p>
-<p id="xp_display">Experience: {{ barbarian.experience }}</p>
-<p>Level: {{ barbarian.level }}</p>
-<p>Items: {{ ', '.join(barbarian['items']) }}</p>
+    <form action="/adventure" method="post">
+      <input type="submit" value="Go on Adventure" />
+    </form>
 
-<form action="/adventure" method="post">
-    <input type="submit" value="Go on Adventure">
-</form>
+    <form action="/toggle_auto_adventure" method="post">
+      <input
+        type="submit"
+        value="{{ 'Enable' if not barbarian.auto_adventure else 'Disable' }} Auto Adventure"
+      />
+    </form>
 
-<form action="/toggle_auto_adventure" method="post">
-    <input type="submit" value="{{ 'Enable' if not barbarian.auto_adventure else 'Disable' }} Auto Adventure">
-</form>
+    <h2>Shop</h2>
+    <select id="shop-items">
+      {% for item, price in shop.items() %}
+      <option value="{{ item }}">
+        {{ item.replace('_', ' ') }} - {{ price }} Gold
+      </option>
+      {% endfor %}
+    </select>
+    <button onclick="buyItem()">Buy</button>
 
-<h2>Shop</h2>
-<select id="shop-items">
-    {% for item, price in shop.items() %}
-    <option value="{{ item }}">{{ item.replace('_', ' ') }} - {{ price }} Gold</option>
-    {% endfor %}
-</select>
-<button onclick="buyItem()">Buy</button>
+    <script>
+      function updateGold() {
+        fetch("/get_gold")
+          .then((response) => response.text())
+          .then((data) => {
+            document.getElementById("goldDisplay").innerText = "Gold: " + data;
+          });
+      }
 
-<script>
-    function updateXP() {
-        fetch('/get_xp')
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('xp_display').innerText = "Experience: " + data;
-        });
-    }
+      function updateXP() {
+        fetch("/get_xp")
+          .then((response) => response.text())
+          .then((data) => {
+            document.getElementById("xp_display").innerText =
+              "Experience: " + data;
+          });
+      }
 
-    setInterval(updateXP, 5000); // Update XP every 5 seconds
-</script>
+      setInterval(updateGold, 5000); // Update Gold every 5 seconds
+      setInterval(updateXP, 5000); // Update XP every 5 seconds
+    </script>
 
-<script>
-    window.onbeforeunload = function() {
+    <script>
+      window.onbeforeunload = function () {
         // Trigger AJAX call to reset the database when the page is refreshed or closed
-        fetch('/reset_database', { method: 'POST' });
-    };
-</script>
-
-
-</body>
+        fetch("/reset_database", { method: "POST" });
+      };
+    </script>
+  </body>
 </html>
