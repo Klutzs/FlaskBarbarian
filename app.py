@@ -21,6 +21,9 @@ class Shop:
             "xp_sword": 200,
         }
 
+    def get_items(self):
+        return ", ".join(self.items)
+
     def buy(self, item, barbarian):
         if item in self.items and barbarian["gold"] >= self.items[item]:
             barbarian["gold"] -= self.items[item]
@@ -84,6 +87,8 @@ def home():
     }
 
     barbarian = session.get("barbarian", default_barbarian)
+    if isinstance(barbarian, dict):
+        barbarian = Shop(**barbarian)
 
     if barbarian["auto_adventure"]:
         calculate_and_simulate_adventures(barbarian)
@@ -103,7 +108,7 @@ def adventure():
     c = conn.cursor()
     c.execute(
         "UPDATE player SET items = ? WHERE id = ?",
-        (str(barbarian["items"]), barbarian["id"]),
+        (barbarian.get_items(), barbarian["id"]),
     )
     conn.commit()
     conn.close()
