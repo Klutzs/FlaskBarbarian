@@ -12,7 +12,12 @@
     <p>Gold: {{ barbarian.gold }}</p>
     <p id="xp_display">Experience: {{ barbarian.experience }}</p>
     <p>Level: {{ barbarian.level }}</p>
-    <p>Items: {{ ', '.join(barbarian['items']) }}</p>
+    <h2>Items</h2>
+    <ul id="items-list">
+      {% for item in barbarian['items'] %}
+      <li>{{ item }}</li>
+      {% endfor %}
+    </ul>
 
     <form action="/adventure" method="post">
       <input type="submit" value="Go on Adventure" />
